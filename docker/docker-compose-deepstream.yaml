@@ -2,8 +2,9 @@ version: '3.8'
 
 services:
   retailytics1:
-    image: nvcr.io/nvidia/deepstream:v9-retailytics
-    hostname: retailytics1
+    image: irl-ncai/deepstream:retailytics-v1
+    stdin_open: true        # docker run -i
+    tty: true        # docker run -t
     runtime: nvidia
     environment:
       DISPLAY: $DISPLAY
@@ -11,7 +12,8 @@ services:
       KAFKA_BROKER_IP: kafka1;19092
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
-    ports:
-      - "9092:9092"
+    command: /bin/bash
+    # ports:
+    #   - "9092:9092"
     # depends_on:
     #   - kafka

@@ -1,0 +1,46 @@
+
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--max-line-length=80",
+        "--disable=E0401,django-not-configured,no-name-in-module",
+        "--load-plugins=pylint_django"
+    ],
+    "python.pythonPath": "/home/sai/.virtualenvs/spark/bin/python",
+    "python.linting.pycodestyleArgs": [
+        "--max-line-length=80"
+    ],
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false,
+    "prettier.tabWidth": 4,
+    "prettier.useTabs": false,
+    "files.trimTrailingWhitespace": true,
+    "editor.rulers": [
+        80
+    ],
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "python.sortImports.args": [
+        "--src=${workspaceFolder}"
+    ],
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/.git": true,
+        "**/.hg": true,
+        "**/.pytest_cache": true,
+        "**/.svn": true,
+        "**/CVS": true,
+        "**/__pycache__": true,
+        "deepstream_manager": true,
+        "django-rest-auth": true,
+        "django-rest-framework-jwt": true,
+        "frontend": false,
+        "heat_maps": true,
+        "templates": true,
+    }
+}
