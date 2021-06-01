@@ -1,37 +1,104 @@
 import os
 
-import pymongo
+from pymongo import MongoClient
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col, explode, from_json, lit, struct
+from pyspark.sql.functions import col, explode, flatten, from_json, lit, struct, array
 from schema import DEEPSTREAM_MSG_SCHEMA, TIMESTAMP_FORMAT
 
-FLOORS_COLLLECTION = "floors"
-HEATMAP_COORDINATES_COLLLECTION = "heatmap_coordinates"
-CAMERAS_COLLLECTION = "cameras"
-CAMERA_EVENTS_COLLLECTION = "camera_events"
+CAMERA_ANALYTICS_COLLECTION = "camera_analytics"
+FLOOR_ANALYTICS_COLLECTION = "floor_analytics"
 
 
-def write_batch(df, epoch_id):
-    cameras_df = df.select("{}.*".format(CAMERAS_COLLLECTION))
-    cameras_df.write.format("mongo") \
-        .mode("append") \
-        .option("collection", CAMERAS_COLLLECTION) \
-        .save()
+def encode_objects(objects):
+    """
+    Encodes the objects in the same manner as the deepstream minimal
+    encoding format
+    """
 
-    camera_events_df = df.select(
-        "{}.*".format(CAMERA_EVENTS_COLLLECTION))
-    camera_events_df.write.format("mongo") \
-        .mode("append") \
-        .option("collection", CAMERA_EVENTS_COLLLECTION) \
-        .save()
+    encoded_objects = []
+    for obj in objects:
+        # add object info
+        encoded_obj = \
+            "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(
+                obj.event.type,
+                obj.id,
+                obj.confidence,
+                obj.bbox.topleftx,
+                obj.bbox.toplefty,
+                obj.bbox.bottomrightx,
+                obj.bbox.bottomrighty,
+                obj.direction,
+                obj.orientation,
+                obj.type)
 
-    heatmap_coordinates_df = df.select(
-        "{}.*".format(HEATMAP_COORDINATES_COLLLECTION))
-    heatmap_coordinates_df.write.format("mongo") \
-        .mode("append") \
-        .option("collection", HEATMAP_COORDINATES_COLLLECTION) \
-        .save()
+        # add additional analytics info
+        encoded_obj += "|#"
+        encoded_obj += "|{},{}".format(
+            obj.local_coordinates.x, obj.local_coordinates.y)
+        encoded_obj += "|{},{}".format(
+            obj.world_coordinates.x, obj.world_coordinates.y)
+
+        encoded_objects.append(encoded_obj)
+    return encoded_objects
+
+
+class ForeachWriter:
+    def open(self, partition_id, epoch_id):
+        mongo_db_url = os.environ['MONGO_DB_URL']
+        mongo_db_database = os.environ['MONGO_DB_DATABASE']
+        self.connection = MongoClient(
+            "mongodb://127.0.0.1:27017/admin:admin")
+        self.db = self.connection['retail_realtime_db']
+        self.camera_analytics = self.db[CAMERA_ANALYTICS_COLLECTION]
+        self.floor_analytics = self.db[FLOOR_ANALYTICS_COLLECTION]
+        return True
+
+    def process(self, row):
+        # # update floor info
+        self.floor_analytics.update(
+            {'_id': row.location.floor},
+            {
+                "$set": {
+                    'location_id': row.location.id,
+                    'level': row.location.level,
+                    'world_coordinates':
+                        row.location.world_coordinates},
+                "$push": {
+                    "heatmap_datapoints": {
+                        "coordinates": row.heatmap_datapoints,
+                        "timestamp": row.timestamp
+                    }
+                }
+            },
+            upsert=True
+        )
+
+        # update camera info
+        objs = [obj.asDict() for obj in row.objects]
+        self.camera_analytics.update(
+            {'_id': row.sensor.id},
+            {
+                "$set": {
+                    'description': row.sensor.description,
+                    'local_coordinates': row.sensor.local_coordinates,
+                    'analyticsModule': row.analyticsModule.asDict(),
+                    'floor_analytics_id': row.location.floor,
+                },
+                "$push": {
+                    "events": {
+                        "frame_id": row.id,
+                        "version": row.version,
+                        "timestamp": row.timestamp,
+                        "objects": objs
+                    }
+                }
+            },
+            upsert=True
+        )
+
+    def close(self, error):
+        pass
 
 
 def main():
@@ -40,20 +107,12 @@ def main():
     """
     # get mongodb connection parameters
     kafka_broker_ip = os.environ['KAFKA_BROKER_IP']
-    mongo_db_url = os.environ['MONGO_DB_URL']
-    mongo_db_database = os.environ['MONGO_DB_DATABASE']
     floor_topic = os.environ['FLOOR_TOPIC']
 
     # generate a new spark session
     spark = SparkSession \
         .builder \
         .appName("DSRetailytics-MongoDB-Connector") \
-        .config(
-            "spark.mongodb.input.uri",
-            "mongodb://{}/{}".format(mongo_db_url, mongo_db_database)) \
-        .config(
-            "spark.mongodb.output.uri",
-            "mongodb://{}/{}".format(mongo_db_url, mongo_db_database)) \
         .getOrCreate()
     spark.sparkContext.setLogLevel("WARN")
 
@@ -80,64 +139,14 @@ def main():
 
     # generate data for heatmap
     df = df \
-        .withColumn(  # add floor id column
-            "_id", col("location.floor")) \
-        .withColumn(  # add floor column with its data
-            FLOORS_COLLLECTION,
-            struct(
-                col("_id"),
-                col("location.id"),
-                col("location.level"),
-                col("location.world_coordinates"))) \
-        .withColumn(
-            # add floor_id column for referencing floors in other columns
-            "{}_id".format(FLOORS_COLLLECTION),
-            col("location.floor")) \
-        .withColumn(  # add heatmap data coordinates
-            "hm_coords_x",
-            explode("objects.world_coordinates.x")) \
-        .withColumn(  # add heatmap data coordinates
-            "hm_coords_y",
-            explode("objects.world_coordinates.y")) \
-        .withColumn(  # add heatmap data coordinates
-            HEATMAP_COORDINATES_COLLLECTION,
-            struct(
-                # add reference to camera collection
-                col("{}_id".format(FLOORS_COLLLECTION)),
-                col("hm_coords_x").alias('x'),
-                col("hm_coords_y").alias('y')))
-
-    # generate data for camera realtime events
-    df = df \
-        .withColumn(
-            "_id", col("sensor.id")) \
-        .withColumn(
-            CAMERAS_COLLLECTION,
-            struct(
-                col("_id"),
-                col("{}_id".format(FLOORS_COLLLECTION)),
-                col("sensor.description"),
-                col("sensor.local_coordinates"),
-                col("analyticsModule"))) \
-        .withColumn(
-            "{}_id".format(CAMERAS_COLLLECTION), col("sensor.id")) \
-        .withColumn(
-            CAMERA_EVENTS_COLLLECTION,
-            struct(
-                col("id"),
-                # add reference to camera collection
-                col("{}_id".format(CAMERAS_COLLLECTION)),
-                col("version"),
-                col("@timestamp"),
-                col("objects")))
+        .withColumn(  # add heatmap data coordinates x
+            "heatmap_datapoints",
+            flatten(F.expr("transform(objects, x -> array(x.world_coordinates.x, x.world_coordinates.y))")))
 
     # write data to output
-    df = df.select(
-        CAMERAS_COLLLECTION,
-        CAMERA_EVENTS_COLLLECTION,
-        HEATMAP_COORDINATES_COLLLECTION) \
+    df = df \
         .writeStream \
-        .foreachBatch(write_batch) \
+        .foreach(ForeachWriter()) \
         .start() \
         .awaitTermination()
 

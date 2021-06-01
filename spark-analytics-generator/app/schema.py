@@ -6,7 +6,7 @@ TIMESTAMP_FORMAT = "yyyy-MM-dd\'T\'HH:mm:ss.sss\'Z\'"
 DEEPSTREAM_MSG_SCHEMA = StructType() \
     .add("version", StringType(), True) \
     .add("id", IntegerType(), True) \
-    .add("@timestamp", TimestampType(), True) \
+    .add("timestamp", TimestampType(), True) \
     .add(
         "location",
         StructType()
