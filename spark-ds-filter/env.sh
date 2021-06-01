@@ -1,2 +1,0 @@
-export KAFKA_BROKER_IP=127.0.0.1:9092
-export DEEPSTREAM_SERVER_TOPIC=deepstream-raw-fdf8f7523b6d
