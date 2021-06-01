@@ -56,7 +56,9 @@ def main():
             'cast(id as string) as key',
             'to_json(struct(*)) as value') \
         .writeStream \
-        .format("console") \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", kafka_broker_ip) \
+        .option("checkpointLocation", "./checkpoint") \
         .start() \
         .awaitTermination()
 
