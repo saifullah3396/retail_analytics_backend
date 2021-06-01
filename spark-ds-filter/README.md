@@ -7,4 +7,4 @@ Build the docker image:
 ```docker build --rm -t irl-ncai-retailytics/spark-ds-filter .```
 
 # Run the application
-```docker run --name app.py -e ENABLE_INIT_DAEMON=false --link spark-master:spark-master --net dockerspark_default -d bde/spark-app```
+```docker run --name app.py -e ENABLE_INIT_DAEMON=false --link spark-master:spark-master -d bde/spark-app```

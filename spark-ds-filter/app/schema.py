@@ -1,5 +1,5 @@
-from pyspark.sql.types import (
-    ArrayType, DoubleType, IntegerType, StringType, StructType, TimestampType)
+from pyspark.sql.types import (ArrayType, DoubleType, IntegerType, StringType,
+                               StructType, TimestampType)
 
 TIMESTAMP_FORMAT = "yyyy-MM-dd\'T\'HH:mm:ss.sss\'Z\'"
 
@@ -24,7 +24,7 @@ DEEPSTREAM_MSG_SCHEMA = StructType() \
         .add("id", StringType(), True)
         .add("description", StringType(), True)
         .add(
-            "world_coordinates",
+            "local_coordinates",
             StructType()
             .add("x", DoubleType(), True)
             .add("y", DoubleType(), True))) \
@@ -35,33 +35,4 @@ DEEPSTREAM_MSG_SCHEMA = StructType() \
         .add("description", StringType(), True)
         .add("source", StringType(), True)
         .add("version", StringType(), True)) \
-    .add(
-        "objects",
-        ArrayType(
-            StructType()
-            .add("id", StringType(), True)
-            .add("direction", DoubleType(), True)
-            .add("orientation", DoubleType(), True)
-            .add("type", StringType(), True)
-            .add(
-                "local_coordinates",
-                StructType()
-                .add("x", DoubleType(), True)
-                .add("y", DoubleType(), True))
-            .add(
-                "world_coordinates",
-                StructType()
-                .add("x", DoubleType(), True)
-                .add("y", DoubleType(), True))
-            .add(
-                "event",
-                StructType()
-                .add("id", StringType(), True)
-                .add("type", StringType(), True))
-            .add(
-                "bbox",
-                StructType()
-                .add("topleftx", IntegerType(), True)
-                .add("toplefty", IntegerType(), True)
-                .add("bottomrightx", IntegerType(), True)
-                .add("bottomrighty", IntegerType(), True))))
+    .add("objects", ArrayType(StringType()))

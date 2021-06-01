@@ -1,57 +1,86 @@
 {
-    "version": "4.0",
-    "id": 0,
-    "@timestamp": "2021-05-31T05:31:19.884Z",
-    "sensorId": "73915c91-6832-4607-8314-001aee71e0b1",
-    "location": {
-        "id": "7082e9bc-5bfd-40e3-a904-9d3879970ce7",
-        "floor": "e9e5cb25-589e-4e4c-83c5-30fe584bad3f",
-        "level": "0",
-        "world_coordinates": {
-            "x": 8125191.0520000001,
-            "y": 3980014.1699999999
-        }
-    },
-    "sensor": {
-        "id": "73915c91-6832-4607-8314-001aee71e0b1",
-        "uri": "rtsp://admin:admin@10.12.41.201",
-        "description": "Entry Camera",
-        "local_coordinates": {
-            "x": 25.0,
-            "y": 30.0
-        }
-    },
-    "analyticsModule": {
-        "id": "",
-        "description": "Retail Person Detection and Tracking",
-        "source": "DSRetailytics",
-        "version": "1.0"
-    },
-    "objects": [
+    "cameras": [
         {
-            "id": "-1",
-            "speed": 0.0,
-            "direction": 0.0,
-            "orientation": 0.0,
-            "type": "Person",
-            "local_coordinates": {
-                "x": -22.515776949527389,
-                "y": 34.300828090276106
+            "version": "4.0",
+            "id": 0,
+            "@timestamp": "2021-05-31T05:31:19.884Z",
+            "sensorId": "73915c91-6832-4607-8314-001aee71e0b1",
+            "location": {
+                "id": "7082e9bc-5bfd-40e3-a904-9d3879970ce7",
+                "floor": "e9e5cb25-589e-4e4c-83c5-30fe584bad3f",
+                "level": "0",
+                "world_coordinates": {
+                    "x": 8125191.0520000001,
+                    "y": 3980014.1699999999
+                }
             },
-            "world_coordinates": {
-                "x": 8125168.5362230502,
-                "y": 3980048.4708280903
+            "sensor": {
+                "id": "73915c91-6832-4607-8314-001aee71e0b1",
+                "uri": "rtsp://admin:admin@10.12.41.201",
+                "description": "Entry Camera",
+                "local_coordinates": {
+                    "x": 25.0,
+                    "y": 30.0
+                }
             },
-            "event": {
-                "id": "1aed5d4f-9e25-4174-921d-a66fd5aab91c",
-                "type": "person-detected"
+            "analyticsModule": {
+                "id": "",
+                "description": "Retail Person Detection and Tracking",
+                "source": "DSRetailytics",
+                "version": "1.0"
             },
-            "bbox": {
-                "topleftx": 330,
-                "toplefty": 207,
-                "bottomrightx": 458,
-                "bottomrighty": 577
-            }
+            "objects": [
+                {
+                    "id": "-1",
+                    "speed": 0.0,
+                    "direction": 0.0,
+                    "orientation": 0.0,
+                    "type": "Person",
+                    "local_coordinates": {
+                        "x": -22.515776949527389,
+                        "y": 34.300828090276106
+                    },
+                    "world_coordinates": {
+                        "x": 8125168.5362230502,
+                        "y": 3980048.4708280903
+                    },
+                    "event": {
+                        "id": "be624a47-64fa-44e4-9152-635507c83574",
+                        "type": "person-detected"
+                    },
+                    "bbox": {
+                        "topleftx": 330,
+                        "toplefty": 207,
+                        "bottomrightx": 458,
+                        "bottomrighty": 577
+                    }
+                },
+                {
+                    "id": "-1",
+                    "speed": 0.0,
+                    "direction": 0.0,
+                    "orientation": 0.0,
+                    "type": "Person",
+                    "local_coordinates": {
+                        "x": -15.51577695,
+                        "y": 34.300828090276106
+                    },
+                    "world_coordinates": {
+                        "x": 8125175.5362230502,
+                        "y": 3980048.4708280903
+                    },
+                    "event": {
+                        "id": "be624a47-64fa-44e4-9152-635507c83574",
+                        "type": "person-detected"
+                    },
+                    "bbox": {
+                        "topleftx": 330,
+                        "toplefty": 207,
+                        "bottomrightx": 458,
+                        "bottomrighty": 577
+                    }
+                }
+            ]
         }
     ]
 }

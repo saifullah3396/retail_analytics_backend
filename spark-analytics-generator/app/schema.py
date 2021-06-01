@@ -1,5 +1,5 @@
-from pyspark.sql.types import (
-    ArrayType, DoubleType, IntegerType, StringType, StructType, TimestampType)
+from pyspark.sql.types import (ArrayType, DoubleType, IntegerType, StringType,
+                               StructType, TimestampType)
 
 TIMESTAMP_FORMAT = "yyyy-MM-dd\'T\'HH:mm:ss.sss\'Z\'"
 
@@ -24,7 +24,7 @@ DEEPSTREAM_MSG_SCHEMA = StructType() \
         .add("id", StringType(), True)
         .add("description", StringType(), True)
         .add(
-            "world_coordinates",
+            "local_coordinates",
             StructType()
             .add("x", DoubleType(), True)
             .add("y", DoubleType(), True))) \

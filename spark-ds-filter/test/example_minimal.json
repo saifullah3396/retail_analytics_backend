@@ -27,31 +27,7 @@
         "source": "DSRetailytics",
         "version": "1.0"
     },
-    "objects": [
-        {
-            "id": "-1",
-            "speed": 0.0,
-            "direction": 0.0,
-            "orientation": 0.0,
-            "type": "Person",
-            "local_coordinates": {
-                "x": -22.515776949527389,
-                "y": 34.300828090276106
-            },
-            "world_coordinates": {
-                "x": 8125168.5362230502,
-                "y": 3980048.4708280903
-            },
-            "event": {
-                "id": "1aed5d4f-9e25-4174-921d-a66fd5aab91c",
-                "type": "person-detected"
-            },
-            "bbox": {
-                "topleftx": 330,
-                "toplefty": 207,
-                "bottomrightx": 458,
-                "bottomrighty": 577
-            }
-        }
+    "objects" : [
+        "-1|330|207.391|458|577.174|Person|#|-22.5158,34.3008|8.12517e+06,3.98005e+06|0"
     ]
 }

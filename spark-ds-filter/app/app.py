@@ -17,6 +17,7 @@ def main():
     """
 
     # get topic of the deepstream server from conatiner environment variables
+    kafka_broker_ip = os.environ['KAFKA_BROKER_IP']
     deepstream_server_topic = os.environ['DEEPSTREAM_SERVER_TOPIC']
 
     # generate spark context
@@ -27,11 +28,11 @@ def main():
     df = spark \
         .readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", os.environ['KAFKA_BROKER_IP']) \
+        .option("kafka.bootstrap.servers", kafka_broker_ip) \
         .option(
             "subscribe",
             "{}".format(deepstream_server_topic)) \
-        .load() \
+        .load()
 
     # generate new kafka topic for the specific block
     json_options = {
@@ -55,12 +56,7 @@ def main():
             'cast(id as string) as key',
             'to_json(struct(*)) as value') \
         .writeStream \
-        .format("kafka") \
-        .option("kafka.bootstrap.servers", "127.0.0.1:9092") \
-        .option(
-            "checkpointLocation",
-            "./checkpoints/{}".format(
-                deepstream_server_topic)) \
+        .format("console") \
         .start() \
         .awaitTermination()
 
