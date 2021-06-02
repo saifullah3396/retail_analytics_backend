@@ -44,15 +44,15 @@
                         "x": 8125168.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 },
                 {
@@ -69,15 +69,15 @@
                         "x": 8125175.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 },
                 {
@@ -94,15 +94,15 @@
                         "x": 8125163.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 }
             ]
@@ -151,15 +151,15 @@
                         "x": 8125168.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 },
                 {
@@ -176,15 +176,15 @@
                         "x": 8125175.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 },
                 {
@@ -201,15 +201,15 @@
                         "x": 8125163.5362230502,
                         "y": 3980048.4708280903
                     },
-                    "event": {
+                    "event_type": {
                         "id": "be624a47-64fa-44e4-9152-635507c83574",
                         "type": "person-detected"
                     },
                     "bbox": {
-                        "topleftx": 330,
-                        "toplefty": 207,
-                        "bottomrightx": 458,
-                        "bottomrighty": 577
+                        "tlx": 330,
+                        "tly": 207,
+                        "brx": 458,
+                        "bry": 577
                     }
                 }
             ]

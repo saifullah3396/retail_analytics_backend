@@ -52,5 +52,5 @@ while True:
     if step > 5.0:
         step = 0.0
     step += 0.05
-    sleep(5)
+    sleep(0.1)
     id_count += 1

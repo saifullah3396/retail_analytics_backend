@@ -1,18 +1,30 @@
 version: '3.8'
 
-services:
-  mongodb:
+services:  
+  mongo1:
+    hostname: mongo1
+    container_name: localmongo1
     image: mongo:latest
-    container_name: mongodb
-    hostname: mongodb
+    expose:
+      - 27017
     ports:
-      - "27017:27017"
-    environment:
-      PUID: 1000
-      PGID: 1000
+      - 27017:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "false" ]
     volumes:
-      - /data/db:/data/db
-    restart: unless-stopped
+      - /opt/mongo1/data/db:/data/db
+      - /opt/mongo1/data/configdb:/data/configdb
+
+  mongo-setup:
+    container_name: mongo-setup
+    image: mongo:latest
+    restart: on-failure
+    volumes:
+      - ./scripts:/opt/scripts
+    entrypoint: [ "/opt/scripts/setup.sh" ] # Make sure this file exists (see below for the setup.sh)
+    depends_on:
+      - mongo1
+
   zoo1:
     image: zookeeper:3.4.9
     hostname: zoo1

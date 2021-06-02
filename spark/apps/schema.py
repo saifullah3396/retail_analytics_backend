@@ -54,14 +54,14 @@ DEEPSTREAM_MSG_SCHEMA = StructType() \
                 .add("x", DoubleType(), True)
                 .add("y", DoubleType(), True))
             .add(
-                "event",
+                "event_type",
                 StructType()
                 .add("id", StringType(), True)
                 .add("type", StringType(), True))
             .add(
                 "bbox",
                 StructType()
-                .add("topleftx", IntegerType(), True)
-                .add("toplefty", IntegerType(), True)
-                .add("bottomrightx", IntegerType(), True)
-                .add("bottomrighty", IntegerType(), True))))
+                .add("tlx", IntegerType(), True)
+                .add("tly", IntegerType(), True)
+                .add("brx", IntegerType(), True)
+                .add("bry", IntegerType(), True))))

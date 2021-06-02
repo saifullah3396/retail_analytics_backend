@@ -6,8 +6,8 @@ from pyspark.sql import functions as F
 from pyspark.sql.functions import col, explode, flatten, from_json, lit, struct, array
 from schema import DEEPSTREAM_MSG_SCHEMA, TIMESTAMP_FORMAT
 
-CAMERA_ANALYTICS_COLLECTION = "camera_analytics"
-FLOOR_ANALYTICS_COLLECTION = "floor_analytics"
+CAMERA_ANALYTICS_COLLECTION = "ds_analytics_cameraanalytics"
+FLOOR_ANALYTICS_COLLECTION = "ds_analytics_flooranalytics"
 
 
 def encode_objects(objects):
@@ -24,10 +24,10 @@ def encode_objects(objects):
                 obj.event.type,
                 obj.id,
                 obj.confidence,
-                obj.bbox.topleftx,
-                obj.bbox.toplefty,
-                obj.bbox.bottomrightx,
-                obj.bbox.bottomrighty,
+                obj.bbox.tlx,
+                obj.bbox.tly,
+                obj.bbox.brx,
+                obj.bbox.bry,
                 obj.direction,
                 obj.orientation,
                 obj.type)
@@ -47,15 +47,15 @@ class ForeachWriter:
     def open(self, partition_id, epoch_id):
         mongo_db_url = os.environ['MONGO_DB_URL']
         mongo_db_database = os.environ['MONGO_DB_DATABASE']
-        self.connection = MongoClient(
-            "mongodb://127.0.0.1:27017/admin:admin")
-        self.db = self.connection['retail_realtime_db']
+        self.connection = MongoClient("mongodb://{}/{}".format(mongo_db_url, mongo_db_database))
+        self.db = self.connection['retail_analytics_db']
         self.camera_analytics = self.db[CAMERA_ANALYTICS_COLLECTION]
         self.floor_analytics = self.db[FLOOR_ANALYTICS_COLLECTION]
         return True
 
     def process(self, row):
-        # # update floor info
+        print('row', row)
+        # update floor info
         self.floor_analytics.update(
             {'_id': row.location.floor},
             {
@@ -63,10 +63,10 @@ class ForeachWriter:
                     'location_id': row.location.id,
                     'level': row.location.level,
                     'world_coordinates':
-                        row.location.world_coordinates},
+                        row.location.world_coordinates.asDict(recursive=True)},
                 "$push": {
                     "heatmap_datapoints": {
-                        "coordinates": row.heatmap_datapoints,
+                        "coordinates": [datapoint.asDict(recursive=True) for datapoint in row.heatmap_datapoints],
                         "timestamp": row.timestamp
                     }
                 }
@@ -75,14 +75,14 @@ class ForeachWriter:
         )
 
         # update camera info
-        objs = [obj.asDict() for obj in row.objects]
+        objs = [obj.asDict(recursive=True) for obj in row.objects]
         self.camera_analytics.update(
             {'_id': row.sensor.id},
             {
                 "$set": {
                     'description': row.sensor.description,
-                    'local_coordinates': row.sensor.local_coordinates,
-                    'analyticsModule': row.analyticsModule.asDict(),
+                    'local_coordinates': row.sensor.local_coordinates.asDict(recursive=True),
+                    'analyticsModule': row.analyticsModule.asDict(recursive=True),
                     'floor_analytics_id': row.location.floor,
                 },
                 "$push": {
@@ -141,7 +141,7 @@ def main():
     df = df \
         .withColumn(  # add heatmap data coordinates x
             "heatmap_datapoints",
-            flatten(F.expr("transform(objects, x -> array(x.world_coordinates.x, x.world_coordinates.y))")))
+            F.expr("transform(objects, x -> x.world_coordinates)"))
 
     # write data to output
     df = df \

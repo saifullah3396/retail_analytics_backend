@@ -60,7 +60,7 @@ services:
   #     - FLOOR_TOPIC=floor-raw-e9e5cb25-589e-4e4c-83c5-30fe584bad34
   #     - KAFKA_BROKER_IP=kafka1:19092
   #     - MONGO_DB_URL=mongodb
-  #     - MONGO_DB_DATABASE=retail_realtime_db
+  #     - MONGO_DB_DATABASE=retail_analytics_db
   #   links:
   #     - spark-master
   #   expose:
@@ -86,7 +86,7 @@ services:
   #     - FLOOR_TOPIC=floor-raw-e9e5cb25-589e-4e4c-83c5-30fe584bad3f
   #     - KAFKA_BROKER_IP=kafka1:19092
   #     - MONGO_DB_URL=mongodb
-  #     - MONGO_DB_DATABASE=retail_realtime_db
+  #     - MONGO_DB_DATABASE=retail_analytics_db
   #   links:
   #     - spark-master
   #   expose:
