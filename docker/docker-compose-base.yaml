@@ -1,6 +1,6 @@
-version: '3.8'
+version: "3.8"
 
-services:  
+services:
   mongo1:
     hostname: mongo1
     container_name: localmongo1
@@ -10,7 +10,18 @@ services:
     ports:
       - 27017:27017
     restart: always
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0", "--journal", "--dbpath", "/data/db", "--enableMajorityReadConcern", "false" ]
+    entrypoint:
+      [
+        "/usr/bin/mongod",
+        "--bind_ip_all",
+        "--replSet",
+        "rs0",
+        "--journal",
+        "--dbpath",
+        "/data/db",
+        "--enableMajorityReadConcern",
+        "false",
+      ]
     volumes:
       - /opt/mongo1/data/db:/data/db
       - /opt/mongo1/data/configdb:/data/configdb
@@ -21,7 +32,7 @@ services:
     restart: on-failure
     volumes:
       - ./scripts:/opt/scripts
-    entrypoint: [ "/opt/scripts/setup.sh" ] # Make sure this file exists (see below for the setup.sh)
+    entrypoint: ["/opt/scripts/setup.sh"] # Make sure this file exists (see below for the setup.sh)
     depends_on:
       - mongo1
 
@@ -30,6 +41,7 @@ services:
     hostname: zoo1
     ports:
       - "2181:2181"
+    restart: always
     environment:
       ZOO_MY_ID: 1
       ZOO_PORT: 2181
@@ -44,6 +56,7 @@ services:
     ports:
       - "9092:9092"
       - "9999:9999"
+    restart: always
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -60,3 +73,25 @@ services:
     #   - /opt/retail_analytics_backend/kafka1/data:/var/lib/kafka/data
     depends_on:
       - zoo1
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass admin
+    ports:
+        - "6379:6379"
+    # volumes:
+    #     - $PWD/redis-data:/var/lib/redis
+    #     - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+        - REDIS_REPLICATION_MODE=master
+    networks:
+        backend_net:
+            ipv4_address: 172.28.1.4
+
+# networking for the Redis container
+networks:
+    backend_net:
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.28.0.0/16
