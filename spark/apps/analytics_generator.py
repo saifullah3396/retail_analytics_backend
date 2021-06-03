@@ -1,9 +1,11 @@
 import os
+import uuid
 
 from pymongo import MongoClient
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col, explode, flatten, from_json, lit, struct, array
+from pyspark.sql.functions import (array, col, explode, flatten, from_json,
+                                   lit, struct)
 from schema import DEEPSTREAM_MSG_SCHEMA, TIMESTAMP_FORMAT
 
 CAMERA_ANALYTICS_COLLECTION = "ds_analytics_cameraanalytics"
@@ -47,7 +49,8 @@ class ForeachWriter:
     def open(self, partition_id, epoch_id):
         mongo_db_url = os.environ['MONGO_DB_URL']
         mongo_db_database = os.environ['MONGO_DB_DATABASE']
-        self.connection = MongoClient("mongodb://{}/{}".format(mongo_db_url, mongo_db_database))
+        self.connection = MongoClient(
+            "mongodb://{}/{}".format(mongo_db_url, mongo_db_database))
         self.db = self.connection['retail_analytics_db']
         self.camera_analytics = self.db[CAMERA_ANALYTICS_COLLECTION]
         self.floor_analytics = self.db[FLOOR_ANALYTICS_COLLECTION]
@@ -57,10 +60,10 @@ class ForeachWriter:
         print('row', row)
         # update floor info
         self.floor_analytics.update(
-            {'_id': row.location.floor},
+            {'_id': uuid.UUID(row.location.floor)},
             {
                 "$set": {
-                    'location_id': row.location.id,
+                    'location_id': uuid.UUID(row.location.id),
                     'level': row.location.level,
                     'world_coordinates':
                         row.location.world_coordinates.asDict(recursive=True)},
@@ -77,13 +80,13 @@ class ForeachWriter:
         # update camera info
         objs = [obj.asDict(recursive=True) for obj in row.objects]
         self.camera_analytics.update(
-            {'_id': row.sensor.id},
+            {'_id': uuid.UUID(row.sensor.id)},
             {
                 "$set": {
                     'description': row.sensor.description,
                     'local_coordinates': row.sensor.local_coordinates.asDict(recursive=True),
                     'analyticsModule': row.analyticsModule.asDict(recursive=True),
-                    'floor_analytics_id': row.location.floor,
+                    'ds_analytics_flooranalytics_id': uuid.UUID(row.location.floor),
                 },
                 "$push": {
                     "events": {
