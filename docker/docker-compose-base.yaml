@@ -79,6 +79,7 @@ services:
     command: redis-server --requirepass admin
     ports:
         - "6379:6379"
+    restart: always
     # volumes:
     #     - $PWD/redis-data:/var/lib/redis
     #     - $PWD/redis.conf:/usr/local/etc/redis/redis.conf

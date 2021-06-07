@@ -3,8 +3,8 @@ version: '3.8'
 services:
   retailytics1:
     image: irl-ncai/deepstream:retailytics-v1
-    stdin_open: true        # docker run -i
-    tty: true        # docker run -t
+    # stdin_open: true
+    # tty: true
     runtime: nvidia
     environment:
       DISPLAY: $DISPLAY
